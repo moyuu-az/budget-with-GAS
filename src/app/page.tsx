@@ -1,101 +1,210 @@
-import Image from "next/image";
+"use client";
+
+import {
+  Alert,
+  AppBar,
+  Box,
+  CircularProgress,
+  Container,
+  Grid,
+  Paper,
+  Snackbar,
+  Toolbar,
+  Typography,
+} from "@mui/material";
+import dynamic from "next/dynamic";
+import { useEffect, useState } from "react";
+import BalanceComponent from "./components/Balance";
+import CreditCards from "./components/CreditCards";
+import Expenses from "./components/Expenses";
+import Incomes from "./components/Income";
+import { fetchBudgetData, updateBudgetData } from "./lib/api";
+import { CreditCard, Expense, Income } from "./types";
+
+// グラフコンポーネントを動的にインポートして、クライアントサイドでのみレンダリング
+const BalanceChart = dynamic(() => import("./components/BalanceChart"), {
+  ssr: false,
+  loading: () => (
+    <Box sx={{ p: 2, textAlign: "center" }}>
+      <CircularProgress />
+    </Box>
+  ),
+});
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [currentBalance, setCurrentBalance] = useState(0);
+  const [creditCards, setCreditCards] = useState<CreditCard[]>([]);
+  const [expenses, setExpenses] = useState<Expense[]>([]);
+  const [incomes, setIncomes] = useState<Income[]>([]);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [mounted, setMounted] = useState(false);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
+  // fetchData関数を先に定義する
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      const data = await fetchBudgetData();
+      setCurrentBalance(data.currentBalance);
+      setCreditCards(data.creditCards || []);
+      setExpenses(data.expenses || []);
+      setIncomes(data.incomes || []);
+      setError(null);
+    } catch (err) {
+      setError("データの取得に失敗しました。再度お試しください。");
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // クライアントサイドでのみ実行されるようにする
+  useEffect(() => {
+    setMounted(true);
+    fetchData();
+  }, []);
+
+  // マウントされていない場合は空のコンテンツを返す
+  if (!mounted) {
+    return null;
+  }
+
+  const handleUpdateBalance = async (newBalance: number) => {
+    try {
+      setLoading(true);
+      const data = await updateBudgetData({ currentBalance: newBalance });
+      setCurrentBalance(data.currentBalance);
+      setSuccessMessage("残高を更新しました");
+    } catch (err) {
+      setError("残高の更新に失敗しました");
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleUpdateCreditCards = async (newCreditCards: CreditCard[]) => {
+    try {
+      setLoading(true);
+      const data = await updateBudgetData({ creditCards: newCreditCards });
+      setCreditCards(data.creditCards);
+      setSuccessMessage("クレジットカード情報を更新しました");
+    } catch (err) {
+      setError("クレジットカード情報の更新に失敗しました");
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleUpdateExpenses = async (newExpenses: Expense[]) => {
+    try {
+      setLoading(true);
+      const data = await updateBudgetData({ expenses: newExpenses });
+      setExpenses(data.expenses);
+      setSuccessMessage("固定支出情報を更新しました");
+    } catch (err) {
+      setError("固定支出情報の更新に失敗しました");
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleUpdateIncomes = async (newIncomes: Income[]) => {
+    try {
+      setLoading(true);
+      const data = await updateBudgetData({ incomes: newIncomes });
+      setIncomes(data.incomes);
+      setSuccessMessage("収入情報を更新しました");
+    } catch (err) {
+      setError("収入情報の更新に失敗しました");
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCloseSnackbar = () => {
+    setSuccessMessage(null);
+    setError(null);
+  };
+
+  return mounted ? (
+    <Box sx={{ flexGrow: 1 }}>
+      <AppBar position="static" sx={{ mb: 4 }}>
+        <Toolbar>
+          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+            家計簿アプリ
+          </Typography>
+        </Toolbar>
+      </AppBar>
+      <Container maxWidth="lg">
+        <Paper sx={{ p: 3, mb: 4 }}>
+          <Typography variant="h4" component="h1" gutterBottom>
+            予算管理
+          </Typography>
+          <Typography variant="body1" paragraph>
+            現在の残高、クレジットカード、固定支出、収入を管理して、予算計画を立てましょう。
+          </Typography>
+        </Paper>
+
+        {loading && (
+          <Box sx={{ display: "flex", justifyContent: "center", mt: 4, mb: 4 }}>
+            <CircularProgress />
+          </Box>
+        )}
+
+        <Grid container spacing={3}>
+          <Grid item xs={12}>
+            <BalanceComponent
+              currentBalance={currentBalance}
+              onUpdateBalance={handleUpdateBalance}
             />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
+          </Grid>
+          <Grid item xs={12} md={6}>
+            <CreditCards
+              creditCards={creditCards}
+              onUpdate={handleUpdateCreditCards}
+            />
+          </Grid>
+          <Grid item xs={12} md={6}>
+            <Expenses expenses={expenses} onUpdate={handleUpdateExpenses} />
+          </Grid>
+          <Grid item xs={12}>
+            <Incomes incomes={incomes} onUpdate={handleUpdateIncomes} />
+          </Grid>
+          <Grid item xs={12}>
+            <BalanceChart
+              currentBalance={currentBalance}
+              creditCards={creditCards}
+              expenses={expenses}
+              incomes={incomes}
+            />
+          </Grid>
+        </Grid>
+
+        <Snackbar
+          open={!!successMessage}
+          autoHideDuration={3000}
+          onClose={handleCloseSnackbar}
         >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
+          <Alert onClose={handleCloseSnackbar} severity="success">
+            {successMessage}
+          </Alert>
+        </Snackbar>
+
+        <Snackbar
+          open={!!error}
+          autoHideDuration={3000}
+          onClose={handleCloseSnackbar}
         >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
-  );
+          <Alert onClose={handleCloseSnackbar} severity="error">
+            {error}
+          </Alert>
+        </Snackbar>
+      </Container>
+    </Box>
+  ) : null;
 }

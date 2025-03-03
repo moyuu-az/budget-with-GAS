@@ -61,7 +61,8 @@ export default function CreditCards({
     handleClose();
   };
 
-  const handleDelete = (id: string) => {
+  const handleDelete = (id: string | undefined) => {
+    if (!id) return;
     onUpdate(creditCards.filter((card) => card.id !== id));
   };
 

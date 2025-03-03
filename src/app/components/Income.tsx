@@ -49,6 +49,7 @@ export default function Incomes({ incomes, onUpdate }: IncomeProps) {
       name: formData.name,
       amount: Number(formData.amount),
       paymentDate: Number(formData.paymentDate),
+      receiptDate: formData.receiptDate || Number(formData.paymentDate),
       isRecurring: formData.isRecurring || false,
     };
 
@@ -62,7 +63,8 @@ export default function Incomes({ incomes, onUpdate }: IncomeProps) {
     handleClose();
   };
 
-  const handleDelete = (id: string) => {
+  const handleDelete = (id: string | undefined) => {
+    if (!id) return;
     onUpdate(incomes.filter((income) => income.id !== id));
   };
 

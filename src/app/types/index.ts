@@ -1,5 +1,5 @@
 export interface CreditCard {
-  id: string;
+  id?: string;
   name: string;
   limit: number;
   paymentDate: number;
@@ -7,18 +7,20 @@ export interface CreditCard {
 }
 
 export interface Expense {
-  id: string;
+  id?: string;
   name: string;
   amount: number;
+  paymentDate: number;
   dueDate: number;
   isRecurring: boolean;
 }
 
 export interface Income {
-  id: string;
+  id?: string;
   name: string;
   amount: number;
   paymentDate: number;
+  receiptDate: number;
   isRecurring: boolean;
 }
 

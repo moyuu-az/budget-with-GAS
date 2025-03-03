@@ -1,44 +1,24 @@
 "use client";
 
-import {
-  Alert,
-  AppBar,
-  Box,
-  CircularProgress,
-  Container,
-  Grid,
-  Paper,
-  Snackbar,
-  Toolbar,
-  Typography,
-} from "@mui/material";
-import dynamic from "next/dynamic";
+import { Toaster } from "@/components/ui/sonner";
 import { useEffect, useState } from "react";
-import BalanceComponent from "./components/Balance";
-import CreditCards from "./components/CreditCards";
-import Expenses from "./components/Expenses";
-import Incomes from "./components/Income";
+import { toast } from "sonner";
+import { BalanceCard } from "./components/balance-card";
+import { BalanceChart } from "./components/balance-chart";
+import { CreditCardList } from "./components/credit-card-list";
+import { ExpenseList } from "./components/expense-list";
+import { FinancialSummary } from "./components/financial-summary";
+import { IncomeList } from "./components/income-list";
+import { Header } from "./components/ui/header";
 import { fetchBudgetData, updateBudgetData } from "./lib/api";
 import { CreditCard, Expense, Income } from "./types";
 
-// グラフコンポーネントを動的にインポートして、クライアントサイドでのみレンダリング
-const BalanceChart = dynamic(() => import("./components/BalanceChart"), {
-  ssr: false,
-  loading: () => (
-    <Box sx={{ p: 2, textAlign: "center" }}>
-      <CircularProgress />
-    </Box>
-  ),
-});
-
 export default function Home() {
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [currentBalance, setCurrentBalance] = useState(0);
   const [creditCards, setCreditCards] = useState<CreditCard[]>([]);
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [incomes, setIncomes] = useState<Income[]>([]);
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [mounted, setMounted] = useState(false);
 
   // fetchData関数を先に定義する
@@ -50,9 +30,8 @@ export default function Home() {
       setCreditCards(data.creditCards || []);
       setExpenses(data.expenses || []);
       setIncomes(data.incomes || []);
-      setError(null);
     } catch (err) {
-      setError("データの取得に失敗しました。再度お試しください。");
+      toast.error("データの取得に失敗しました。再度お試しください。");
       console.error(err);
     } finally {
       setLoading(false);
@@ -75,9 +54,9 @@ export default function Home() {
       setLoading(true);
       const data = await updateBudgetData({ currentBalance: newBalance });
       setCurrentBalance(data.currentBalance);
-      setSuccessMessage("残高を更新しました");
+      toast.success("残高を更新しました");
     } catch (err) {
-      setError("残高の更新に失敗しました");
+      toast.error("残高の更新に失敗しました");
       console.error(err);
     } finally {
       setLoading(false);
@@ -89,9 +68,9 @@ export default function Home() {
       setLoading(true);
       const data = await updateBudgetData({ creditCards: newCreditCards });
       setCreditCards(data.creditCards);
-      setSuccessMessage("クレジットカード情報を更新しました");
+      toast.success("クレジットカード情報を更新しました");
     } catch (err) {
-      setError("クレジットカード情報の更新に失敗しました");
+      toast.error("クレジットカード情報の更新に失敗しました");
       console.error(err);
     } finally {
       setLoading(false);
@@ -103,9 +82,9 @@ export default function Home() {
       setLoading(true);
       const data = await updateBudgetData({ expenses: newExpenses });
       setExpenses(data.expenses);
-      setSuccessMessage("固定支出情報を更新しました");
+      toast.success("固定支出情報を更新しました");
     } catch (err) {
-      setError("固定支出情報の更新に失敗しました");
+      toast.error("固定支出情報の更新に失敗しました");
       console.error(err);
     } finally {
       setLoading(false);
@@ -117,94 +96,66 @@ export default function Home() {
       setLoading(true);
       const data = await updateBudgetData({ incomes: newIncomes });
       setIncomes(data.incomes);
-      setSuccessMessage("収入情報を更新しました");
+      toast.success("収入情報を更新しました");
     } catch (err) {
-      setError("収入情報の更新に失敗しました");
+      toast.error("収入情報の更新に失敗しました");
       console.error(err);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleCloseSnackbar = () => {
-    setSuccessMessage(null);
-    setError(null);
-  };
+  return (
+    <div className="flex min-h-screen flex-col bg-gray-50">
+      <Header />
+      <main className="flex-1 w-full">
+        <div className="w-full py-6 md:py-8 lg:py-10 px-4 md:px-8 lg:px-16 max-w-[1600px] mx-auto">
+          <div className="grid gap-8 md:grid-cols-12">
+            {/* 左サイドバー（PCではサイドバー固定） */}
+            <div className="md:col-span-3 lg:col-span-3 space-y-8">
+              <BalanceCard
+                currentBalance={currentBalance}
+                onUpdateBalance={handleUpdateBalance}
+                isLoading={loading}
+              />
+              <FinancialSummary
+                currentBalance={currentBalance}
+                creditCards={creditCards}
+                expenses={expenses}
+                incomes={incomes}
+              />
+            </div>
 
-  return mounted ? (
-    <Box sx={{ flexGrow: 1 }}>
-      <AppBar position="static" sx={{ mb: 4 }}>
-        <Toolbar>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            家計簿アプリ
-          </Typography>
-        </Toolbar>
-      </AppBar>
-      <Container maxWidth="lg">
-        <Paper sx={{ p: 3, mb: 4 }}>
-          <Typography variant="h4" component="h1" gutterBottom>
-            予算管理
-          </Typography>
-          <Typography variant="body1" paragraph>
-            現在の残高、クレジットカード、固定支出、収入を管理して、予算計画を立てましょう。
-          </Typography>
-        </Paper>
-
-        {loading && (
-          <Box sx={{ display: "flex", justifyContent: "center", mt: 4, mb: 4 }}>
-            <CircularProgress />
-          </Box>
-        )}
-
-        <Grid container spacing={3}>
-          <Grid item xs={12}>
-            <BalanceComponent
-              currentBalance={currentBalance}
-              onUpdateBalance={handleUpdateBalance}
-            />
-          </Grid>
-          <Grid item xs={12} md={6}>
-            <CreditCards
-              creditCards={creditCards}
-              onUpdate={handleUpdateCreditCards}
-            />
-          </Grid>
-          <Grid item xs={12} md={6}>
-            <Expenses expenses={expenses} onUpdate={handleUpdateExpenses} />
-          </Grid>
-          <Grid item xs={12}>
-            <Incomes incomes={incomes} onUpdate={handleUpdateIncomes} />
-          </Grid>
-          <Grid item xs={12}>
-            <BalanceChart
-              currentBalance={currentBalance}
-              creditCards={creditCards}
-              expenses={expenses}
-              incomes={incomes}
-            />
-          </Grid>
-        </Grid>
-
-        <Snackbar
-          open={!!successMessage}
-          autoHideDuration={3000}
-          onClose={handleCloseSnackbar}
-        >
-          <Alert onClose={handleCloseSnackbar} severity="success">
-            {successMessage}
-          </Alert>
-        </Snackbar>
-
-        <Snackbar
-          open={!!error}
-          autoHideDuration={3000}
-          onClose={handleCloseSnackbar}
-        >
-          <Alert onClose={handleCloseSnackbar} severity="error">
-            {error}
-          </Alert>
-        </Snackbar>
-      </Container>
-    </Box>
-  ) : null;
+            {/* メインコンテンツエリア */}
+            <div className="md:col-span-9 lg:col-span-9 space-y-8">
+              <CreditCardList
+                creditCards={creditCards}
+                onUpdate={handleUpdateCreditCards}
+                isLoading={loading}
+              />
+              <div className="grid gap-8 md:grid-cols-2">
+                <ExpenseList
+                  expenses={expenses}
+                  onUpdate={handleUpdateExpenses}
+                  isLoading={loading}
+                />
+                <IncomeList
+                  incomes={incomes}
+                  onUpdate={handleUpdateIncomes}
+                  isLoading={loading}
+                />
+              </div>
+              <BalanceChart
+                currentBalance={currentBalance}
+                creditCards={creditCards}
+                expenses={expenses}
+                incomes={incomes}
+              />
+            </div>
+          </div>
+        </div>
+      </main>
+      <Toaster position="bottom-right" />
+    </div>
+  );
 }

@@ -1,11 +1,5 @@
 import { CreditCard, Expense, Income } from "../types";
 
-// 本番環境での実際のGASエンドポイント（環境変数から取得）
-const GAS_ENDPOINT = process.env.NEXT_PUBLIC_GAS_ENDPOINT || "";
-
-// 開発環境かどうかを確認
-const isDevelopment = process.env.NODE_ENV === "development";
-
 // ローカルAPIプロキシのエンドポイント
 const API_PROXY = "/api/gas";
 

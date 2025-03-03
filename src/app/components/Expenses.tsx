@@ -48,6 +48,7 @@ export default function Expenses({ expenses, onUpdate }: ExpensesProps) {
       id: editingExpense?.id || Date.now().toString(),
       name: formData.name,
       amount: Number(formData.amount),
+      paymentDate: formData.paymentDate || 1,
       dueDate: Number(formData.dueDate),
       isRecurring: formData.isRecurring || false,
     };
@@ -62,7 +63,8 @@ export default function Expenses({ expenses, onUpdate }: ExpensesProps) {
     handleClose();
   };
 
-  const handleDelete = (id: string) => {
+  const handleDelete = (id: string | undefined) => {
+    if (!id) return;
     onUpdate(expenses.filter((expense) => expense.id !== id));
   };
 

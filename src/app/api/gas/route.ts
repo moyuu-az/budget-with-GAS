@@ -52,12 +52,19 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     console.log("Proxy: GASエンドポイントにデータを送信:", body);
 
-    const response = await fetch(GAS_ENDPOINT, {
-      method: "POST",
+    // Google Apps ScriptではGETリクエストを使用してデータを送信
+    // クエリパラメータとしてデータを追加
+    const urlWithParams = new URL(GAS_ENDPOINT);
+    urlWithParams.searchParams.append("action", "update");
+    urlWithParams.searchParams.append("data", JSON.stringify(body));
+
+    console.log("GETリクエスト先:", urlWithParams.toString());
+
+    const response = await fetch(urlWithParams.toString(), {
+      method: "GET",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(body),
     });
 
     if (!response.ok) {

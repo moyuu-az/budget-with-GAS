@@ -11,7 +11,7 @@ import {
   Title,
   Tooltip,
 } from "chart.js";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Line } from "react-chartjs-2";
 import { CreditCard, Expense, Income } from "../types";
 
@@ -51,11 +51,8 @@ export default function BalanceChart({
     datasets: [],
   });
 
-  useEffect(() => {
-    generateChartData();
-  }, [currentBalance, creditCards, expenses, incomes]);
-
-  const generateChartData = () => {
+  // generateChartData関数をuseCallbackでメモ化
+  const generateChartData = useCallback(() => {
     // 今日の日付を取得
     const today = new Date();
     const labels: string[] = [];
@@ -112,7 +109,11 @@ export default function BalanceChart({
         },
       ],
     });
-  };
+  }, [currentBalance, creditCards, expenses, incomes]);
+
+  useEffect(() => {
+    generateChartData();
+  }, [generateChartData]);
 
   const options = {
     responsive: true,

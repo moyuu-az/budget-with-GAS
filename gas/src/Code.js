@@ -216,12 +216,31 @@ function updateData(data) {
 }
 
 // Web APIとして公開するための関数
-function doGet() {
+function doGet(e) {
   try {
     // スプレッドシートが初期化されているか確認
     checkAndInitializeIfNeeded();
 
-    // データを取得してJSONに変換
+    // アクションがupdateの場合はデータを更新
+    if (
+      e &&
+      e.parameter &&
+      e.parameter.action === "update" &&
+      e.parameter.data
+    ) {
+      const data = JSON.parse(e.parameter.data);
+      console.log("データ更新リクエストを受信:", data);
+
+      // データを更新
+      const updatedData = updateData(data);
+
+      // 更新したデータをJSONに変換して返す
+      return ContentService.createTextOutput(
+        JSON.stringify(updatedData),
+      ).setMimeType(ContentService.MimeType.JSON);
+    }
+
+    // 通常のGETリクエストの場合はデータを取得
     const data = getData();
 
     // 正常な応答を返す

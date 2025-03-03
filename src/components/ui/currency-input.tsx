@@ -56,7 +56,7 @@ export const CurrencyInput = React.forwardRef<
 
   return (
     <div className="relative">
-      <span className="absolute left-4 top-1/2 transform -translate-y-1/2 text-muted-foreground">
+      <span className="absolute left-5 top-1/2 transform -translate-y-1/2 text-muted-foreground text-lg">
         ¥
       </span>
       <Input
@@ -65,7 +65,7 @@ export const CurrencyInput = React.forwardRef<
         inputMode="numeric"
         value={displayValue}
         onChange={handleChange}
-        className={cn("pl-8", className)}
+        className={cn("pl-10 text-base", className)}
         {...props}
       />
     </div>

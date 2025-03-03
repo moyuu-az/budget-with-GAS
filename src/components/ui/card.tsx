@@ -9,8 +9,8 @@ const Card = React.forwardRef<
   <div
     ref={ref}
     className={cn(
-      "rounded-xl border border-border/40 bg-white shadow-md transition-all hover:shadow-lg hover:border-border/60",
-      className,
+      "rounded-lg border bg-card text-card-foreground shadow-sm transition-all duration-200 hover:shadow",
+      className
     )}
     {...props}
   />
@@ -23,7 +23,7 @@ const CardHeader = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <div
     ref={ref}
-    className={cn("flex flex-col space-y-1.5 p-6 pb-4", className)}
+    className={cn("flex flex-col space-y-1.5 p-6", className)}
     {...props}
   />
 ));
@@ -36,8 +36,8 @@ const CardTitle = React.forwardRef<
   <h3
     ref={ref}
     className={cn(
-      "text-xl font-semibold leading-none tracking-tight text-foreground",
-      className,
+      "text-2xl font-semibold leading-none tracking-tight",
+      className
     )}
     {...props}
   />
@@ -50,7 +50,7 @@ const CardDescription = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <p
     ref={ref}
-    className={cn("text-sm text-muted-foreground mt-1.5", className)}
+    className={cn("text-sm text-muted-foreground", className)}
     {...props}
   />
 ));
@@ -60,7 +60,7 @@ const CardContent = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
 >(({ className, ...props }, ref) => (
-  <div ref={ref} className={cn("p-6 pt-2", className)} {...props} />
+  <div ref={ref} className={cn("p-6 pt-0", className)} {...props} />
 ));
 CardContent.displayName = "CardContent";
 
@@ -70,17 +70,44 @@ const CardFooter = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <div
     ref={ref}
-    className={cn("flex items-center p-6 pt-0 gap-2", className)}
+    className={cn("flex items-center p-6 pt-0", className)}
     {...props}
   />
 ));
 CardFooter.displayName = "CardFooter";
 
+// 新しいグラデーションカードコンポーネント
+const GradientCard = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement> & {
+    gradient?: "blue" | "green" | "purple" | "red" | "orange";
+    hoverEffect?: boolean;
+  }
+>(({ className, gradient = "blue", hoverEffect = true, ...props }, ref) => {
+  const gradientMap = {
+    blue: "bg-gradient-to-r from-blue-500 to-blue-600",
+    green: "bg-gradient-to-r from-green-500 to-green-600",
+    purple: "bg-gradient-to-r from-purple-500 to-purple-600",
+    red: "bg-gradient-to-r from-red-500 to-red-600",
+    orange: "bg-gradient-to-r from-orange-500 to-orange-600",
+  };
+
+  return (
+    <div
+      ref={ref}
+      className={cn(
+        "rounded-lg text-white shadow-sm",
+        gradientMap[gradient],
+        hoverEffect && "transition-all duration-200 hover:shadow-lg hover:-translate-y-1",
+        className
+      )}
+      {...props}
+    />
+  );
+});
+GradientCard.displayName = "GradientCard";
+
 export {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
+  Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle, GradientCard
 };
+

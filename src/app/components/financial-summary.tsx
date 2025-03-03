@@ -3,22 +3,21 @@
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
+  GradientCard,
 } from "@/components/ui/card";
 import {
-  BarChart,
-  ChevronUp,
-  CreditCard,
-  DollarSign,
-  TrendingDown,
+  ArrowDownIcon,
+  ArrowUpIcon,
+  CreditCardIcon,
+  DollarSignIcon,
 } from "lucide-react";
-import { CreditCard as CreditCardType, Expense, Income } from "../types";
+import { CreditCard, Expense, Income } from "../types";
 
 interface FinancialSummaryProps {
   currentBalance: number;
-  creditCards: CreditCardType[];
+  creditCards: CreditCard[];
   expenses: Expense[];
   incomes: Income[];
 }
@@ -29,110 +28,182 @@ export function FinancialSummary({
   expenses,
   incomes,
 }: FinancialSummaryProps) {
-  // 月間支出の計算
-  const monthlyExpenses = expenses.reduce((total, expense) => {
-    return expense.isRecurring ? total + expense.amount : total;
-  }, 0);
+  // 総クレジットカード残高
+  const totalCreditCard = creditCards.reduce(
+    (sum, card) => sum + card.balance,
+    0
+  );
 
-  // 月間収入の計算
-  const monthlyIncome = incomes.reduce((total, income) => {
-    return income.isRecurring ? total + income.amount : total;
-  }, 0);
+  // 月間固定支出
+  const monthlyExpenses = expenses.reduce(
+    (sum, expense) => sum + expense.amount,
+    0
+  );
 
-  // クレジットカード負債の計算
-  const creditCardDebt = creditCards.reduce((total, card) => {
-    return total + card.currentBalance;
-  }, 0);
+  // 月間収入
+  const monthlyIncome = incomes.reduce((sum, income) => sum + income.amount, 0);
 
-  // 月間貯蓄額の計算
-  const monthlySavings = monthlyIncome - monthlyExpenses;
+  // 月間収支
+  const monthlyBalance = monthlyIncome - monthlyExpenses;
 
-  // 予算の残りの日数（月末まで）
-  const today = new Date();
-  const lastDayOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
-  const daysLeft = lastDayOfMonth.getDate() - today.getDate();
+  // 支払い可能か確認
+  const isAffordable = currentBalance >= monthlyExpenses;
 
   return (
-    <Card className="shadow-md">
-      <CardHeader className="pb-2">
-        <CardTitle className="text-xl font-semibold">財務サマリー</CardTitle>
-        <CardDescription>今月の収支状況</CardDescription>
-      </CardHeader>
-      <CardContent className="p-4 space-y-4">
-        <div className="grid grid-cols-2 gap-3">
-          <div className="bg-card rounded-md p-3 border">
-            <div className="flex items-center justify-between mb-1">
-              <p className="text-xs font-medium text-muted-foreground">
-                月間収入
-              </p>
-              <div className="rounded-full p-1 bg-green-100">
-                <ChevronUp className="h-3 w-3 text-green-600" />
-              </div>
-            </div>
-            <p className="text-lg font-semibold">
-              ¥{monthlyIncome.toLocaleString()}
-            </p>
-          </div>
-          <div className="bg-card rounded-md p-3 border">
-            <div className="flex items-center justify-between mb-1">
-              <p className="text-xs font-medium text-muted-foreground">
-                月間支出
-              </p>
-              <div className="rounded-full p-1 bg-red-100">
-                <TrendingDown className="h-3 w-3 text-red-600" />
-              </div>
-            </div>
-            <p className="text-lg font-semibold">
-              ¥{monthlyExpenses.toLocaleString()}
-            </p>
-          </div>
-        </div>
+    <div className="space-y-4">
+      <Card className="overflow-hidden shadow-md transition-all hover:shadow-lg">
+        <CardHeader className="bg-gradient-to-r from-purple-500 to-purple-600 text-white pb-2">
+          <CardTitle className="text-lg font-medium">財務サマリー</CardTitle>
+        </CardHeader>
+        <CardContent className="p-4">
+          <div className="space-y-3">
+            <SummaryItem
+              title="クレジットカード残高"
+              value={`¥${totalCreditCard.toLocaleString()}`}
+              icon={
+                <div className="rounded-full bg-red-100 p-1.5">
+                  <CreditCardIcon className="h-4 w-4 text-red-500" />
+                </div>
+              }
+              textColor="text-red-600"
+            />
 
-        <div className="grid grid-cols-2 gap-3">
-          <div className="bg-card rounded-md p-3 border">
-            <div className="flex items-center justify-between mb-1">
-              <p className="text-xs font-medium text-muted-foreground">
-                月間貯蓄
-              </p>
-              <div className="rounded-full p-1 bg-blue-100">
-                <DollarSign className="h-3 w-3 text-blue-600" />
-              </div>
-            </div>
-            <p
-              className={`text-lg font-semibold ${monthlySavings >= 0 ? "text-green-600" : "text-red-600"}`}
-            >
-              ¥{monthlySavings.toLocaleString()}
-            </p>
-          </div>
-          <div className="bg-card rounded-md p-3 border">
-            <div className="flex items-center justify-between mb-1">
-              <p className="text-xs font-medium text-muted-foreground">
-                カード負債
-              </p>
-              <div className="rounded-full p-1 bg-orange-100">
-                <CreditCard className="h-3 w-3 text-orange-600" />
-              </div>
-            </div>
-            <p className="text-lg font-semibold">
-              ¥{creditCardDebt.toLocaleString()}
-            </p>
-          </div>
-        </div>
+            <SummaryItem
+              title="月間固定支出"
+              value={`¥${monthlyExpenses.toLocaleString()}`}
+              icon={
+                <div className="rounded-full bg-orange-100 p-1.5">
+                  <ArrowDownIcon className="h-4 w-4 text-orange-500" />
+                </div>
+              }
+              textColor="text-orange-600"
+            />
 
-        <div className="bg-card rounded-md p-3 border">
-          <div className="flex items-center justify-between mb-1">
-            <p className="text-xs font-medium text-muted-foreground">
-              月末まで残り {daysLeft}日
-            </p>
-            <div className="rounded-full p-1 bg-purple-100">
-              <BarChart className="h-3 w-3 text-purple-600" />
+            <SummaryItem
+              title="月間収入"
+              value={`¥${monthlyIncome.toLocaleString()}`}
+              icon={
+                <div className="rounded-full bg-green-100 p-1.5">
+                  <ArrowUpIcon className="h-4 w-4 text-green-500" />
+                </div>
+              }
+              textColor="text-green-600"
+            />
+
+            <div className="border-t pt-3 mt-3">
+              <SummaryItem
+                title="月間収支"
+                value={`¥${monthlyBalance.toLocaleString()}`}
+                icon={
+                  <div className="rounded-full bg-blue-100 p-1.5">
+                    <DollarSignIcon className="h-4 w-4 text-blue-500" />
+                  </div>
+                }
+                textColor={monthlyBalance >= 0 ? "text-green-600" : "text-red-600"}
+                isImportant
+              />
             </div>
           </div>
-          <p className="text-lg font-semibold">
-            ¥{currentBalance.toLocaleString()}
-          </p>
-        </div>
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
+
+      <div className="grid gap-3">
+        <StatusCard
+          title="支払い能力"
+          status={isAffordable ? "良好" : "注意"}
+          variant={isAffordable ? "green" : "orange"}
+          description={
+            isAffordable
+              ? "現在の残高で今月の支出をカバーできます"
+              : "現在の残高では今月の支出をカバーできません"
+          }
+        />
+
+        <StatusCard
+          title="収支バランス"
+          status={monthlyBalance >= 0 ? "黒字" : "赤字"}
+          variant={monthlyBalance >= 0 ? "blue" : "red"}
+          description={
+            monthlyBalance >= 0
+              ? "月間収入が支出を上回っています"
+              : "月間支出が収入を上回っています"
+          }
+        />
+      </div>
+    </div>
+  );
+}
+
+interface SummaryItemProps {
+  title: string;
+  value: string;
+  icon: React.ReactNode;
+  textColor?: string;
+  isImportant?: boolean;
+}
+
+function SummaryItem({
+  title,
+  value,
+  icon,
+  textColor = "text-foreground",
+  isImportant = false,
+}: SummaryItemProps) {
+  return (
+    <div className="flex items-center justify-between">
+      <div className="flex items-center space-x-3">
+        {icon}
+        <span className="text-sm font-medium text-gray-600">{title}</span>
+      </div>
+      <span
+        className={`font-semibold ${textColor} ${isImportant ? "text-lg" : "text-sm"
+          }`}
+      >
+        {value}
+      </span>
+    </div>
+  );
+}
+
+interface StatusCardProps {
+  title: string;
+  status: string;
+  description: string;
+  variant: "blue" | "green" | "red" | "orange";
+}
+
+function StatusCard({
+  title,
+  status,
+  description,
+  variant,
+}: StatusCardProps) {
+  const variantStyles = {
+    blue: {
+      bg: "from-blue-500 to-blue-600",
+      text: "text-blue-50",
+    },
+    green: {
+      bg: "from-green-500 to-green-600",
+      text: "text-green-50",
+    },
+    red: {
+      bg: "from-red-500 to-red-600",
+      text: "text-red-50",
+    },
+    orange: {
+      bg: "from-orange-500 to-orange-600",
+      text: "text-orange-50",
+    },
+  };
+
+  return (
+    <GradientCard gradient={variant} className="p-3.5">
+      <div className="flex items-center justify-between mb-1">
+        <h3 className="text-sm font-medium text-white/90">{title}</h3>
+        <span className="text-sm font-bold">{status}</span>
+      </div>
+      <p className="text-xs text-white/80">{description}</p>
+    </GradientCard>
   );
 }

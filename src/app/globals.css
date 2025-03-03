@@ -56,6 +56,13 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+
+  /* グラデーションカラー */
+  --gradient-blue: linear-gradient(135deg, #4f46e5 0%, #3b82f6 100%);
+  --gradient-green: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+  --gradient-purple: linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%);
+  --gradient-red: linear-gradient(135deg, #ef4444 0%, #f87171 100%);
+  --gradient-orange: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);
 }
 
 /* ダークモードを無効化して常に白ベースにする */
@@ -168,26 +175,60 @@ body {
 .card {
   background: white;
   border-radius: var(--radius);
-  box-shadow:
-    0 4px 6px -1px rgba(0, 0, 0, 0.1),
-    0 2px 4px -2px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.1);
   overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.card:hover {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+  transform: translateY(-2px);
 }
 
 .card-header {
-  padding: 1rem;
+  padding: 1rem 1.25rem;
   border-bottom: 1px solid rgba(0, 0, 0, 0.05);
   background-color: rgba(0, 0, 0, 0.02);
 }
 
 .card-content {
-  padding: 1rem;
+  padding: 1.25rem;
 }
 
 .card-footer {
-  padding: 1rem;
+  padding: 0.75rem 1.25rem;
   border-top: 1px solid rgba(0, 0, 0, 0.05);
   background-color: rgba(0, 0, 0, 0.02);
+}
+
+/* グラデーションバッジスタイル */
+.gradient-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: white;
+  border-radius: 9999px;
+  background-image: var(--gradient-blue);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.gradient-badge-green {
+  background-image: var(--gradient-green);
+}
+
+.gradient-badge-purple {
+  background-image: var(--gradient-purple);
+}
+
+.gradient-badge-red {
+  background-image: var(--gradient-red);
+}
+
+.gradient-badge-orange {
+  background-image: var(--gradient-orange);
 }
 
 /* テキスト強調スタイル */
@@ -204,6 +245,28 @@ body {
 .text-subtle {
   color: #6b7280;
   font-weight: 400;
+}
+
+/* 洗練されたフォームスタイル */
+.form-input {
+  display: block;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: #111827;
+  background-color: #fff;
+  background-clip: padding-box;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.375rem;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+  height: 3rem;
+}
+
+.form-input:focus {
+  border-color: #4f46e5;
+  outline: 0;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
 }
 
 @theme inline {
@@ -247,17 +310,21 @@ body {
 
 @layer base {
   * {
-    @apply border-border outline-ring/50;
+    border-color: var(--border);
+    outline-color: var(--ring);
+    outline-width: 2px;
+    outline-offset: 2px;
   }
 
   body {
-    @apply bg-background text-foreground;
+    background-color: var(--background);
+    color: var(--foreground);
   }
 
   html,
   body {
-    width: 100%;
-    max-width: 100%;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
   h1,
@@ -266,10 +333,9 @@ body {
   h4,
   h5,
   h6 {
-    font-weight: 700;
+    font-weight: 600;
+    letter-spacing: -0.025em;
     line-height: 1.2;
-    letter-spacing: -0.02em;
-    color: #111827;
   }
 
   .text-balance {

@@ -5,6 +5,7 @@ import {
   Card,
   CardContent,
   CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -17,7 +18,12 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { CreditCard as CreditCardIcon, PlusCircle } from "lucide-react";
+import {
+  CreditCard as CreditCardIcon,
+  Pencil,
+  PlusCircle,
+  Trash2,
+} from "lucide-react";
 import { useState } from "react";
 import { CreditCard } from "../types";
 
@@ -113,123 +119,125 @@ export function CreditCardList({
 
   return (
     <>
-      <Card className="border-0 bg-gradient-to-br from-white to-gray-50 shadow-lg overflow-hidden">
-        <CardHeader className="flex flex-row items-center justify-between pb-2 border-b">
-          <div className="space-y-1">
-            <CardTitle className="text-xl font-bold text-gray-900">
-              クレジットカード
-            </CardTitle>
-            <CardDescription className="text-sm font-medium text-gray-600">
-              登録されたクレジットカード一覧
-            </CardDescription>
-          </div>
-          <div className="rounded-full bg-primary/10 p-2">
-            <CreditCardIcon className="h-5 w-5 text-primary" />
+      <Card className="shadow-md">
+        <CardHeader className="pb-2">
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="text-xl font-semibold">
+                クレジットカード
+              </CardTitle>
+              <CardDescription>登録されたクレジットカード一覧</CardDescription>
+            </div>
+            <div className="rounded-full bg-primary/10 p-2">
+              <CreditCardIcon className="h-5 w-5 text-primary" />
+            </div>
           </div>
         </CardHeader>
         <CardContent className="p-4">
           {creditCards.length === 0 ? (
-            <div className="flex h-[140px] items-center justify-center rounded-md border border-dashed p-8 bg-gray-50">
+            <div className="flex h-[140px] items-center justify-center rounded-md border border-dashed p-8 bg-muted/50">
               <div className="text-center">
-                <p className="text-sm font-medium text-gray-500">
+                <p className="text-sm font-medium text-muted-foreground">
                   登録されたクレジットカードはありません。
                 </p>
               </div>
             </div>
           ) : (
-            <div className="space-y-4 max-h-[300px] overflow-y-auto pr-2">
+            <div className="space-y-3 max-h-[300px] overflow-y-auto pr-2">
               {creditCards.map((card) => (
                 <div
                   key={card.id}
-                  className="rounded-xl border bg-white overflow-hidden shadow-sm hover:shadow-md transition-all"
+                  className="rounded-md border bg-card overflow-hidden"
                 >
-                  <div className="bg-gray-50 p-3 border-b flex items-center justify-between">
+                  <div className="bg-muted/50 p-3 border-b flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <CreditCardIcon className="h-4 w-4 text-gray-500" />
-                      <span className="font-semibold text-gray-900">
-                        {card.name}
-                      </span>
+                      <CreditCardIcon className="h-4 w-4 text-muted-foreground" />
+                      <span className="font-medium">{card.name}</span>
                     </div>
-                    <div className="flex items-center gap-1">
+                    <div className="flex items-center gap-2">
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="h-7 w-7 rounded-full hover:bg-gray-200"
+                        className="h-8 w-8"
                         onClick={() => handleEditCard(card)}
                         disabled={isLoading}
                       >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          className="h-3.5 w-3.5"
-                        >
-                          <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" />
-                          <path d="m15 5 4 4" />
-                        </svg>
+                        <Pencil className="h-4 w-4" />
                         <span className="sr-only">編集</span>
                       </Button>
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="h-7 w-7 rounded-full hover:bg-red-50 hover:text-red-500"
+                        className="h-8 w-8 text-destructive"
                         onClick={() => handleDeleteCard(card.id)}
                         disabled={isLoading}
                       >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          className="h-3.5 w-3.5"
-                        >
-                          <path d="M3 6h18" />
-                          <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
-                          <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
-                        </svg>
+                        <Trash2 className="h-4 w-4" />
                         <span className="sr-only">削除</span>
                       </Button>
                     </div>
                   </div>
-                  <div className="p-4">
-                    <div className="grid grid-cols-3 gap-4 text-sm">
+                  <div className="p-3">
+                    <div className="grid grid-cols-2 gap-3 mb-3">
                       <div>
-                        <div className="text-gray-500 mb-1">利用枠</div>
-                        <div className="font-semibold">
+                        <p className="text-xs font-medium text-muted-foreground mb-1">
+                          利用可能枠
+                        </p>
+                        <p className="text-sm font-medium">
                           ¥{card.limit.toLocaleString()}
-                        </div>
+                        </p>
                       </div>
                       <div>
-                        <div className="text-gray-500 mb-1">支払日</div>
-                        <div
-                          className={`font-semibold ${getPaymentStatusClass(card.paymentDate)}`}
+                        <p className="text-xs font-medium text-muted-foreground mb-1">
+                          支払日
+                        </p>
+                        <p
+                          className={`text-sm font-medium ${getPaymentStatusClass(
+                            card.paymentDate,
+                          )}`}
                         >
-                          {card.paymentDate}日
-                        </div>
-                      </div>
-                      <div>
-                        <div className="text-gray-500 mb-1">現在の利用額</div>
-                        <div
-                          className={`font-semibold ${getUtilizationClass(card.currentBalance, card.limit)}`}
-                        >
-                          ¥{card.currentBalance.toLocaleString()}
-                        </div>
+                          毎月{card.paymentDate}日
+                        </p>
                       </div>
                     </div>
-                    <div className="mt-3 bg-gray-200 rounded-full h-2 overflow-hidden">
-                      <div
-                        className={`h-full rounded-full ${getUtilizationBarClass(card.currentBalance, card.limit)}`}
-                        style={{
-                          width: `${Math.min(100, card.limit > 0 ? (card.currentBalance / card.limit) * 100 : 0)}%`,
-                        }}
-                      />
+                    <div className="space-y-1">
+                      <div className="flex items-center justify-between">
+                        <p className="text-xs font-medium text-muted-foreground">
+                          現在の利用額
+                        </p>
+                        <p
+                          className={`text-sm font-medium ${getUtilizationClass(
+                            card.currentBalance,
+                            card.limit,
+                          )}`}
+                        >
+                          ¥{card.currentBalance.toLocaleString()} (
+                          {card.limit > 0
+                            ? Math.round(
+                                (card.currentBalance / card.limit) * 100,
+                              )
+                            : 0}
+                          %)
+                        </p>
+                      </div>
+                      <div className="w-full h-2 bg-muted rounded-full overflow-hidden">
+                        <div
+                          className={`h-full ${getUtilizationBarClass(
+                            card.currentBalance,
+                            card.limit,
+                          )}`}
+                          style={{
+                            width: `${
+                              card.limit > 0
+                                ? Math.min(
+                                    (card.currentBalance / card.limit) * 100,
+                                    100,
+                                  )
+                                : 0
+                            }%`,
+                          }}
+                        ></div>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -237,156 +245,96 @@ export function CreditCardList({
             </div>
           )}
         </CardContent>
-        <div className="p-4 border-t">
+        <CardFooter className="pt-2 border-t">
           <Button
-            variant="outline"
-            className="w-full border-gray-300 hover:bg-gray-100 font-medium"
             onClick={handleAddCard}
+            className="w-full"
+            size="sm"
             disabled={isLoading}
           >
-            <PlusCircle className="mr-2 h-4 w-4" />
-            クレジットカードを追加
+            <PlusCircle className="h-4 w-4 mr-2" />
+            カードを追加
           </Button>
-        </div>
+        </CardFooter>
       </Card>
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="bg-white shadow-2xl">
+        <DialogContent>
           <DialogHeader>
-            <DialogTitle className="text-2xl font-bold text-gray-900">
+            <DialogTitle>
               {editingCard
                 ? "クレジットカードを編集"
                 : "クレジットカードを追加"}
             </DialogTitle>
-            <DialogDescription className="text-base text-gray-600">
+            <DialogDescription>
               クレジットカードの情報を入力してください。
             </DialogDescription>
           </DialogHeader>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 py-4">
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <label
-                  htmlFor="name"
-                  className="text-base font-medium text-gray-800"
-                >
-                  カード名
-                </label>
-                <Input
-                  id="name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  className="h-12 text-base bg-white border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20"
-                  placeholder="JCBカード"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <label
-                  htmlFor="paymentDate"
-                  className="text-base font-medium text-gray-800"
-                >
-                  支払日
-                </label>
-                <div className="relative">
-                  <Input
-                    id="paymentDate"
-                    type="number"
-                    min={1}
-                    max={31}
-                    value={paymentDate}
-                    onChange={(e) => setPaymentDate(Number(e.target.value))}
-                    className="h-12 text-base pr-12 bg-white border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20"
-                    placeholder="25"
-                  />
-                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500">
-                    日
-                  </span>
-                </div>
-              </div>
+          <div className="grid gap-4 py-4">
+            <div className="grid gap-2">
+              <label htmlFor="name" className="text-sm font-medium">
+                カード名
+              </label>
+              <Input
+                id="name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="楽天カード、JCBカードなど"
+                disabled={isLoading}
+              />
             </div>
-
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <label
-                  htmlFor="limit"
-                  className="text-base font-medium text-gray-800"
-                >
-                  利用限度額
-                </label>
-                <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">
-                    ¥
-                  </span>
-                  <Input
-                    id="limit"
-                    type="number"
-                    value={limit}
-                    onChange={(e) => setLimit(Number(e.target.value))}
-                    className="h-12 text-base pl-8 bg-white border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20"
-                    placeholder="1000000"
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <label
-                  htmlFor="currentBalance"
-                  className="text-base font-medium text-gray-800"
-                >
-                  現在の利用額
-                </label>
-                <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">
-                    ¥
-                  </span>
-                  <Input
-                    id="currentBalance"
-                    type="number"
-                    value={currentBalance}
-                    onChange={(e) => setCurrentBalance(Number(e.target.value))}
-                    className="h-12 text-base pl-8 bg-white border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20"
-                    placeholder="250000"
-                  />
-                </div>
-
-                {limit > 0 && (
-                  <div className="mt-2 p-3 bg-gray-50 rounded-lg border border-gray-200">
-                    <div className="flex justify-between text-sm text-gray-600 mb-1.5">
-                      <span className="font-medium">
-                        利用率: {Math.round((currentBalance / limit) * 100)}%
-                      </span>
-                      <span>
-                        {currentBalance.toLocaleString()} /{" "}
-                        {limit.toLocaleString()}
-                      </span>
-                    </div>
-                    <div className="bg-gray-200 rounded-full h-2.5 overflow-hidden">
-                      <div
-                        className={`h-full rounded-full ${getUtilizationBarClass(currentBalance, limit)}`}
-                        style={{
-                          width: `${Math.min(100, limit > 0 ? (currentBalance / limit) * 100 : 0)}%`,
-                        }}
-                      />
-                    </div>
-                  </div>
-                )}
-              </div>
+            <div className="grid gap-2">
+              <label htmlFor="paymentDate" className="text-sm font-medium">
+                支払日
+              </label>
+              <Input
+                id="paymentDate"
+                type="number"
+                min={1}
+                max={31}
+                value={paymentDate}
+                onChange={(e) => setPaymentDate(Number(e.target.value))}
+                placeholder="毎月の支払日"
+                disabled={isLoading}
+              />
+            </div>
+            <div className="grid gap-2">
+              <label htmlFor="limit" className="text-sm font-medium">
+                利用限度額
+              </label>
+              <Input
+                id="limit"
+                type="number"
+                value={limit}
+                onChange={(e) => setLimit(Number(e.target.value))}
+                placeholder="利用限度額を入力"
+                disabled={isLoading}
+              />
+            </div>
+            <div className="grid gap-2">
+              <label htmlFor="currentBalance" className="text-sm font-medium">
+                現在の利用額
+              </label>
+              <Input
+                id="currentBalance"
+                type="number"
+                value={currentBalance}
+                onChange={(e) => setCurrentBalance(Number(e.target.value))}
+                placeholder="現在の利用額を入力"
+                disabled={isLoading}
+              />
             </div>
           </div>
           <DialogFooter>
             <Button
               variant="outline"
               onClick={() => setIsDialogOpen(false)}
-              className="h-12 min-w-[120px] text-base px-6 border-gray-300"
+              disabled={isLoading}
             >
               キャンセル
             </Button>
-            <Button
-              onClick={handleSubmit}
-              disabled={isLoading}
-              className="bg-primary text-white hover:bg-primary/90 h-12 min-w-[120px] text-base px-6 shadow-md"
-            >
-              {isLoading ? "処理中..." : "保存"}
+            <Button onClick={handleSubmit} disabled={isLoading}>
+              {isLoading ? "処理中..." : editingCard ? "更新" : "追加"}
             </Button>
           </DialogFooter>
         </DialogContent>

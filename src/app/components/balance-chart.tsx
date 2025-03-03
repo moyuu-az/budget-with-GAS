@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -49,27 +50,14 @@ export function BalanceChart({
   expenses,
   incomes,
 }: BalanceChartProps) {
-  const [chartType, setChartType] = useState<"monthly" | "yearly">("monthly");
-  const [mounted, setMounted] = useState(false);
+  const [activeTab, setActiveTab] = useState("monthly");
+  const [monthlyData, setMonthlyData] = useState<any>(null);
+  const [yearlyData, setYearlyData] = useState<any>(null);
 
-  // クライアントサイドでのみレンダリングされるようにする
   useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  if (!mounted) {
-    return (
-      <Card className="border-2 shadow-sm">
-        <CardHeader>
-          <CardTitle>収支予測</CardTitle>
-          <CardDescription>データをロード中...</CardDescription>
-        </CardHeader>
-        <CardContent className="h-80 flex items-center justify-center">
-          <div className="animate-pulse bg-muted h-full w-full rounded-md"></div>
-        </CardContent>
-      </Card>
-    );
-  }
+    setMonthlyData(generateMonthlyData());
+    setYearlyData(generateYearlyData());
+  }, [currentBalance, creditCards, expenses, incomes]);
 
   // 今月の日付を取得
   const today = new Date();
@@ -201,124 +189,151 @@ export function BalanceChart({
     };
   };
 
-  const monthlyData = generateMonthlyData();
-  const yearlyData = generateYearlyData();
-
-  // チャートのオプション設定
-  const options = {
-    responsive: true,
-    maintainAspectRatio: false,
-    interaction: {
-      mode: "index" as const,
-      intersect: false,
-    },
-    plugins: {
-      legend: {
-        position: "top" as const,
-        labels: {
-          boxWidth: 15,
-          padding: 15,
-          font: {
-            family:
-              '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-            size: 12,
-          },
-        },
-      },
-      tooltip: {
-        padding: 10,
-        bodyFont: {
-          size: 13,
-        },
-        titleFont: {
-          size: 14,
-        },
-        callbacks: {
-          label: function (context: {
-            dataset: { label?: string };
-            parsed: { y: number | null };
-          }) {
-            let label = context.dataset.label || "";
-            if (label) {
-              label += ": ";
-            }
-            if (context.parsed.y !== null) {
-              label += `¥${context.parsed.y.toLocaleString()}`;
-            }
-            return label;
-          },
-        },
-      },
-    },
-    scales: {
-      x: {
-        grid: {
-          display: false,
-        },
-        ticks: {
-          font: {
-            size: 11,
-          },
-        },
-      },
-      y: {
-        beginAtZero: false,
-        ticks: {
-          callback: function (tickValue: string | number) {
-            return `¥${Number(tickValue).toLocaleString()}`;
-          },
-          font: {
-            size: 11,
-          },
-        },
-        grid: {
-          color: "rgba(0, 0, 0, 0.05)",
-          borderDash: [5, 5],
-        },
-      },
-    },
-  };
-
   return (
-    <Card className="border bg-white shadow-md rounded-lg overflow-hidden">
-      <CardHeader className="pb-4 bg-gray-50">
+    <Card className="shadow-md">
+      <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
           <div>
-            <CardTitle className="text-xl font-bold tracking-tight text-gray-900">
-              収支予測
-            </CardTitle>
-            <CardDescription className="text-sm font-medium text-gray-600">
-              今後の残高推移
-            </CardDescription>
+            <CardTitle className="text-xl font-semibold">残高推移</CardTitle>
+            <CardDescription>今後の残高予測</CardDescription>
           </div>
-          <div className="flex rounded-lg border p-1 text-sm bg-white shadow-sm">
-            <button
-              onClick={() => setChartType("monthly")}
-              className={`rounded-md px-3 py-1 font-medium ${chartType === "monthly"
-                  ? "bg-black text-white"
-                  : "hover:bg-gray-100 text-gray-700"
-                }`}
+          <div className="flex space-x-1">
+            <Button
+              variant={activeTab === "monthly" ? "default" : "outline"}
+              size="sm"
+              onClick={() => setActiveTab("monthly")}
+              className="text-xs"
             >
               月間
-            </button>
-            <button
-              onClick={() => setChartType("yearly")}
-              className={`rounded-md px-3 py-1 font-medium ${chartType === "yearly"
-                  ? "bg-black text-white"
-                  : "hover:bg-gray-100 text-gray-700"
-                }`}
+            </Button>
+            <Button
+              variant={activeTab === "yearly" ? "default" : "outline"}
+              size="sm"
+              onClick={() => setActiveTab("yearly")}
+              className="text-xs"
             >
               年間
-            </button>
+            </Button>
           </div>
         </div>
       </CardHeader>
-      <CardContent className="p-6">
-        <div className="h-[350px]">
-          {chartType === "monthly" ? (
-            <Line options={options} data={monthlyData} />
-          ) : (
-            <Bar options={options} data={yearlyData} />
+      <CardContent className="p-4">
+        <div className="h-[300px]">
+          {activeTab === "monthly" && monthlyData && (
+            <Line
+              data={monthlyData}
+              options={{
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                  legend: {
+                    position: "top" as const,
+                    labels: {
+                      boxWidth: 12,
+                      usePointStyle: true,
+                      pointStyle: "circle",
+                    },
+                  },
+                  tooltip: {
+                    mode: "index",
+                    intersect: false,
+                    callbacks: {
+                      label: function (context) {
+                        let label = context.dataset.label || "";
+                        if (label) {
+                          label += ": ";
+                        }
+                        if (context.parsed.y !== null) {
+                          label += new Intl.NumberFormat("ja-JP", {
+                            style: "currency",
+                            currency: "JPY",
+                            maximumFractionDigits: 0,
+                          }).format(context.parsed.y);
+                        }
+                        return label;
+                      },
+                    },
+                  },
+                },
+                scales: {
+                  x: {
+                    grid: {
+                      display: false,
+                    },
+                  },
+                  y: {
+                    ticks: {
+                      callback: function (value) {
+                        return new Intl.NumberFormat("ja-JP", {
+                          style: "currency",
+                          currency: "JPY",
+                          notation: "compact",
+                          maximumFractionDigits: 0,
+                        }).format(value as number);
+                      },
+                    },
+                  },
+                },
+              }}
+            />
+          )}
+          {activeTab === "yearly" && yearlyData && (
+            <Bar
+              data={yearlyData}
+              options={{
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                  legend: {
+                    position: "top" as const,
+                    labels: {
+                      boxWidth: 12,
+                      usePointStyle: true,
+                      pointStyle: "circle",
+                    },
+                  },
+                  tooltip: {
+                    mode: "index",
+                    intersect: false,
+                    callbacks: {
+                      label: function (context) {
+                        let label = context.dataset.label || "";
+                        if (label) {
+                          label += ": ";
+                        }
+                        if (context.parsed.y !== null) {
+                          label += new Intl.NumberFormat("ja-JP", {
+                            style: "currency",
+                            currency: "JPY",
+                            maximumFractionDigits: 0,
+                          }).format(context.parsed.y);
+                        }
+                        return label;
+                      },
+                    },
+                  },
+                },
+                scales: {
+                  x: {
+                    grid: {
+                      display: false,
+                    },
+                  },
+                  y: {
+                    ticks: {
+                      callback: function (value) {
+                        return new Intl.NumberFormat("ja-JP", {
+                          style: "currency",
+                          currency: "JPY",
+                          notation: "compact",
+                          maximumFractionDigits: 0,
+                        }).format(value as number);
+                      },
+                    },
+                  },
+                },
+              }}
+            />
           )}
         </div>
       </CardContent>

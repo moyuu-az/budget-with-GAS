@@ -53,78 +53,82 @@ export function FinancialSummary({
   const daysLeft = lastDayOfMonth.getDate() - today.getDate();
 
   return (
-    <Card className="border-0 bg-gradient-to-br from-white to-gray-50 shadow-lg overflow-hidden">
-      <CardHeader className="border-b">
-        <CardTitle className="text-xl font-bold text-gray-900">
-          財務サマリー
-        </CardTitle>
-        <CardDescription className="text-sm font-medium text-gray-600">
-          今月の収支状況
-        </CardDescription>
+    <Card className="shadow-md">
+      <CardHeader className="pb-2">
+        <CardTitle className="text-xl font-semibold">財務サマリー</CardTitle>
+        <CardDescription>今月の収支状況</CardDescription>
       </CardHeader>
-      <CardContent className="p-4 space-y-5">
-        <div className="grid grid-cols-2 gap-4">
-          <div className="bg-white rounded-xl p-4 shadow-sm hover:shadow-md transition-all">
-            <div className="flex items-center justify-between mb-2">
-              <p className="text-sm font-medium text-gray-500">月間収入</p>
-              <div className="rounded-full p-1.5 bg-green-100">
-                <ChevronUp className="h-3.5 w-3.5 text-green-600" />
+      <CardContent className="p-4 space-y-4">
+        <div className="grid grid-cols-2 gap-3">
+          <div className="bg-card rounded-md p-3 border">
+            <div className="flex items-center justify-between mb-1">
+              <p className="text-xs font-medium text-muted-foreground">
+                月間収入
+              </p>
+              <div className="rounded-full p-1 bg-green-100">
+                <ChevronUp className="h-3 w-3 text-green-600" />
               </div>
             </div>
-            <p className="text-2xl font-bold text-gray-900">
+            <p className="text-lg font-semibold">
               ¥{monthlyIncome.toLocaleString()}
             </p>
           </div>
-          <div className="bg-white rounded-xl p-4 shadow-sm hover:shadow-md transition-all">
-            <div className="flex items-center justify-between mb-2">
-              <p className="text-sm font-medium text-gray-500">月間支出</p>
-              <div className="rounded-full p-1.5 bg-red-100">
-                <TrendingDown className="h-3.5 w-3.5 text-red-600" />
+          <div className="bg-card rounded-md p-3 border">
+            <div className="flex items-center justify-between mb-1">
+              <p className="text-xs font-medium text-muted-foreground">
+                月間支出
+              </p>
+              <div className="rounded-full p-1 bg-red-100">
+                <TrendingDown className="h-3 w-3 text-red-600" />
               </div>
             </div>
-            <p className="text-2xl font-bold text-gray-900">
+            <p className="text-lg font-semibold">
               ¥{monthlyExpenses.toLocaleString()}
             </p>
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
-          <div className="bg-white rounded-xl p-4 shadow-sm hover:shadow-md transition-all">
-            <div className="flex items-center justify-between mb-2">
-              <p className="text-sm font-medium text-gray-500">月間貯蓄</p>
-              <div className="rounded-full p-1.5 bg-blue-100">
-                <DollarSign className="h-3.5 w-3.5 text-blue-600" />
+        <div className="grid grid-cols-2 gap-3">
+          <div className="bg-card rounded-md p-3 border">
+            <div className="flex items-center justify-between mb-1">
+              <p className="text-xs font-medium text-muted-foreground">
+                月間貯蓄
+              </p>
+              <div className="rounded-full p-1 bg-blue-100">
+                <DollarSign className="h-3 w-3 text-blue-600" />
               </div>
             </div>
             <p
-              className={`text-2xl font-bold ${monthlySavings >= 0 ? "text-green-600" : "text-red-600"}`}
+              className={`text-lg font-semibold ${monthlySavings >= 0 ? "text-green-600" : "text-red-600"}`}
             >
               ¥{monthlySavings.toLocaleString()}
             </p>
           </div>
-          <div className="bg-white rounded-xl p-4 shadow-sm hover:shadow-md transition-all">
-            <div className="flex items-center justify-between mb-2">
-              <p className="text-sm font-medium text-gray-500">カード負債</p>
-              <div className="rounded-full p-1.5 bg-orange-100">
-                <CreditCard className="h-3.5 w-3.5 text-orange-600" />
+          <div className="bg-card rounded-md p-3 border">
+            <div className="flex items-center justify-between mb-1">
+              <p className="text-xs font-medium text-muted-foreground">
+                カード負債
+              </p>
+              <div className="rounded-full p-1 bg-orange-100">
+                <CreditCard className="h-3 w-3 text-orange-600" />
               </div>
             </div>
-            <p className="text-2xl font-bold text-gray-900">
+            <p className="text-lg font-semibold">
               ¥{creditCardDebt.toLocaleString()}
             </p>
           </div>
         </div>
 
-        <div className="bg-white rounded-xl p-4 shadow-sm hover:shadow-md transition-all border-t border-dashed">
-          <div className="flex items-center justify-between mb-2">
-            <p className="text-sm font-medium text-gray-500">
+        <div className="bg-card rounded-md p-3 border">
+          <div className="flex items-center justify-between mb-1">
+            <p className="text-xs font-medium text-muted-foreground">
               月末まで残り {daysLeft}日
             </p>
-            <div className="rounded-full p-1.5 bg-purple-100">
-              <BarChart className="h-3.5 w-3.5 text-purple-600" />
+            <div className="rounded-full p-1 bg-purple-100">
+              <BarChart className="h-3 w-3 text-purple-600" />
             </div>
           </div>
-          <p className="text-2xl font-bold text-gray-900">
+          <p className="text-lg font-semibold">
             ¥{currentBalance.toLocaleString()}
           </p>
         </div>

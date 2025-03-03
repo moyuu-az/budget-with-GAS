@@ -106,13 +106,13 @@ export default function Home() {
   };
 
   return (
-    <div className="flex min-h-screen flex-col bg-gray-50">
+    <div className="flex min-h-screen flex-col bg-background">
       <Header />
       <main className="flex-1 w-full">
-        <div className="w-full py-6 md:py-8 lg:py-10 px-4 md:px-8 lg:px-16 max-w-[1600px] mx-auto">
-          <div className="grid gap-8 md:grid-cols-12">
-            {/* 左サイドバー（PCではサイドバー固定） */}
-            <div className="md:col-span-3 lg:col-span-3 space-y-8">
+        <div className="w-full py-6 md:py-8 lg:py-10 px-4 md:px-6 lg:px-8 max-w-[1200px] mx-auto">
+          <div className="grid gap-6 md:grid-cols-12">
+            {/* 左サイドバー - 残高と財務サマリー */}
+            <div className="md:col-span-3 space-y-6">
               <BalanceCard
                 currentBalance={currentBalance}
                 onUpdateBalance={handleUpdateBalance}
@@ -127,13 +127,18 @@ export default function Home() {
             </div>
 
             {/* メインコンテンツエリア */}
-            <div className="md:col-span-9 lg:col-span-9 space-y-8">
-              <CreditCardList
-                creditCards={creditCards}
-                onUpdate={handleUpdateCreditCards}
-                isLoading={loading}
-              />
-              <div className="grid gap-8 md:grid-cols-2">
+            <div className="md:col-span-9 space-y-6">
+              {/* クレジットカードセクション */}
+              <div className="grid gap-6">
+                <CreditCardList
+                  creditCards={creditCards}
+                  onUpdate={handleUpdateCreditCards}
+                  isLoading={loading}
+                />
+              </div>
+
+              {/* 支出と収入のセクション */}
+              <div className="grid gap-6 md:grid-cols-2">
                 <ExpenseList
                   expenses={expenses}
                   onUpdate={handleUpdateExpenses}
@@ -145,12 +150,16 @@ export default function Home() {
                   isLoading={loading}
                 />
               </div>
-              <BalanceChart
-                currentBalance={currentBalance}
-                creditCards={creditCards}
-                expenses={expenses}
-                incomes={incomes}
-              />
+
+              {/* 残高チャートセクション */}
+              <div className="grid gap-6">
+                <BalanceChart
+                  currentBalance={currentBalance}
+                  creditCards={creditCards}
+                  expenses={expenses}
+                  incomes={incomes}
+                />
+              </div>
             </div>
           </div>
         </div>

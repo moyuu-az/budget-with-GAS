@@ -37,7 +37,7 @@ import {
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { CircleDollarSign, PlusCircle } from "lucide-react";
+import { CircleDollarSign, Pencil, PlusCircle, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
@@ -133,94 +133,88 @@ export function ExpenseList({
   };
 
   return (
-    <Card className="border-0 bg-gradient-to-br from-white to-gray-50 shadow-lg overflow-hidden">
-      <CardHeader className="flex flex-row items-center justify-between pb-2 border-b">
-        <div className="space-y-1">
-          <CardTitle className="text-xl font-bold text-gray-900">
-            固定支出
-          </CardTitle>
-          <CardDescription className="text-sm font-medium text-gray-600">
-            定期的な支払い項目
-          </CardDescription>
-        </div>
-        <div className="rounded-full bg-primary/10 p-2">
-          <CircleDollarSign className="h-5 w-5 text-primary" />
+    <Card className="shadow-md">
+      <CardHeader className="pb-2">
+        <div className="flex items-center justify-between">
+          <div>
+            <CardTitle className="text-xl font-semibold">固定支出</CardTitle>
+            <CardDescription>毎月の固定支出項目</CardDescription>
+          </div>
+          <div className="rounded-full bg-primary/10 p-2">
+            <CircleDollarSign className="h-5 w-5 text-primary" />
+          </div>
         </div>
       </CardHeader>
-      <CardContent className="px-6 py-4">
+      <CardContent className="p-4">
         {expenses.length === 0 ? (
-          <div className="flex h-[140px] items-center justify-center rounded-md border border-dashed p-8 bg-gray-50">
+          <div className="flex h-[140px] items-center justify-center rounded-md border border-dashed p-8 bg-muted/50">
             <div className="text-center">
-              <p className="text-sm font-medium text-gray-600">
-                登録された支出項目はありません。
+              <p className="text-sm font-medium text-muted-foreground">
+                登録された固定支出はありません。
               </p>
             </div>
           </div>
         ) : (
-          <div className="space-y-3 max-h-[240px] overflow-y-auto pr-2">
+          <div className="space-y-3 max-h-[300px] overflow-y-auto pr-2">
             {expenses.map((expense, index) => (
               <div
-                key={index}
-                className="flex items-center justify-between rounded-xl border p-4 text-sm bg-white hover:shadow-md transition-all"
+                key={expense.id || index}
+                className="rounded-md border bg-card overflow-hidden"
               >
-                <div className="grid gap-1">
-                  <div className="font-semibold text-gray-900">
-                    {expense.name}
+                <div className="bg-muted/50 p-3 border-b flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <CircleDollarSign className="h-4 w-4 text-muted-foreground" />
+                    <span className="font-medium">{expense.name}</span>
                   </div>
-                  <div className="text-xs font-medium text-gray-600 bg-gray-100 px-2 py-1 rounded-full inline-block">
-                    毎月{expense.paymentDate}日
-                  </div>
-                </div>
-                <div className="flex items-center gap-3">
-                  <div className="font-semibold text-gray-900 bg-primary/10 px-3 py-1 rounded-lg">
-                    ¥{expense.amount.toLocaleString()}
-                  </div>
-                  <div className="flex gap-1">
+                  <div className="flex items-center gap-2">
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-8 w-8 rounded-full hover:bg-gray-100"
+                      className="h-8 w-8"
                       onClick={() => handleEdit(index)}
                       disabled={isLoading}
                     >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        className="h-4 w-4"
-                      >
-                        <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" />
-                        <path d="m15 5 4 4" />
-                      </svg>
+                      <Pencil className="h-4 w-4" />
                       <span className="sr-only">編集</span>
                     </Button>
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-8 w-8 rounded-full hover:bg-red-50 hover:text-red-500"
+                      className="h-8 w-8 text-destructive"
                       onClick={() => handleDelete(index)}
                       disabled={isLoading}
                     >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        className="h-4 w-4"
-                      >
-                        <path d="M3 6h18" />
-                        <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
-                        <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
-                      </svg>
+                      <Trash2 className="h-4 w-4" />
                       <span className="sr-only">削除</span>
                     </Button>
+                  </div>
+                </div>
+                <div className="p-3">
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <p className="text-xs font-medium text-muted-foreground mb-1">
+                        金額
+                      </p>
+                      <p className="text-sm font-medium">
+                        ¥{expense.amount.toLocaleString()}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-xs font-medium text-muted-foreground mb-1">
+                        支払日
+                      </p>
+                      <p className="text-sm font-medium">
+                        毎月{expense.paymentDate}日
+                      </p>
+                    </div>
+                  </div>
+                  <div className="mt-2">
+                    <p className="text-xs font-medium text-muted-foreground mb-1">
+                      種類
+                    </p>
+                    <p className="text-sm font-medium">
+                      {expense.isRecurring ? "毎月の支出" : "一時的な支出"}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -228,49 +222,39 @@ export function ExpenseList({
           </div>
         )}
       </CardContent>
-      <CardFooter className="border-t">
+      <CardFooter className="pt-2 border-t">
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
-            <Button
-              variant="outline"
-              className="w-full border-gray-300 hover:bg-gray-100 font-medium"
-              disabled={isLoading}
-            >
-              <PlusCircle className="mr-2 h-4 w-4" />
+            <Button className="w-full" size="sm" disabled={isLoading}>
+              <PlusCircle className="h-4 w-4 mr-2" />
               支出項目を追加
             </Button>
           </DialogTrigger>
-          <DialogContent className="bg-white shadow-2xl">
+          <DialogContent>
             <DialogHeader>
-              <DialogTitle className="text-2xl font-bold text-gray-900">
+              <DialogTitle>
                 {editIndex !== null ? "支出項目を編集" : "支出項目を追加"}
               </DialogTitle>
-              <DialogDescription className="text-base text-gray-600">
+              <DialogDescription>
                 毎月の固定支出項目を登録してください。
               </DialogDescription>
             </DialogHeader>
             <Form {...form}>
               <form
                 onSubmit={form.handleSubmit(onSubmit)}
-                className="space-y-6"
+                className="space-y-4"
               >
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid gap-4">
                   <FormField
                     control={form.control}
                     name="name"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-base font-medium text-gray-800">
-                          支出項目名
-                        </FormLabel>
+                        <FormLabel>項目名</FormLabel>
                         <FormControl>
-                          <Input
-                            {...field}
-                            placeholder="家賃"
-                            className="h-12 text-base bg-white border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20"
-                          />
+                          <Input placeholder="家賃、光熱費など" {...field} />
                         </FormControl>
-                        <FormMessage className="text-sm text-red-500" />
+                        <FormMessage />
                       </FormItem>
                     )}
                   />
@@ -279,24 +263,18 @@ export function ExpenseList({
                     name="amount"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-base font-medium text-gray-800">
-                          金額
-                        </FormLabel>
+                        <FormLabel>金額</FormLabel>
                         <FormControl>
-                          <div className="relative">
-                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">
-                              ¥
-                            </span>
-                            <Input
-                              {...field}
-                              type="number"
-                              placeholder="50000"
-                              min={1}
-                              className="h-12 text-base pl-8 bg-white border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20"
-                            />
-                          </div>
+                          <Input
+                            type="number"
+                            placeholder="金額を入力"
+                            {...field}
+                            onChange={(e) =>
+                              field.onChange(Number(e.target.value))
+                            }
+                          />
                         </FormControl>
-                        <FormMessage className="text-sm text-red-500" />
+                        <FormMessage />
                       </FormItem>
                     )}
                   />
@@ -305,9 +283,7 @@ export function ExpenseList({
                     name="paymentDate"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-base font-medium text-gray-800">
-                          支払日
-                        </FormLabel>
+                        <FormLabel>支払日</FormLabel>
                         <Select
                           onValueChange={(value) =>
                             field.onChange(Number(value))
@@ -315,25 +291,21 @@ export function ExpenseList({
                           value={field.value.toString()}
                         >
                           <FormControl>
-                            <SelectTrigger className="h-12 text-base bg-white border-gray-300 focus:ring-2 focus:ring-primary/20">
+                            <SelectTrigger>
                               <SelectValue placeholder="支払日を選択" />
                             </SelectTrigger>
                           </FormControl>
-                          <SelectContent className="max-h-80 bg-white">
+                          <SelectContent>
                             {Array.from({ length: 31 }, (_, i) => i + 1).map(
                               (day) => (
-                                <SelectItem
-                                  key={day}
-                                  value={day.toString()}
-                                  className="text-base"
-                                >
+                                <SelectItem key={day} value={day.toString()}>
                                   {day}日
                                 </SelectItem>
                               ),
                             )}
                           </SelectContent>
                         </Select>
-                        <FormMessage className="text-sm text-red-500" />
+                        <FormMessage />
                       </FormItem>
                     )}
                   />
@@ -342,9 +314,7 @@ export function ExpenseList({
                     name="dueDate"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-base font-medium text-gray-800">
-                          締め日
-                        </FormLabel>
+                        <FormLabel>締め日</FormLabel>
                         <Select
                           onValueChange={(value) =>
                             field.onChange(Number(value))
@@ -352,25 +322,21 @@ export function ExpenseList({
                           value={field.value.toString()}
                         >
                           <FormControl>
-                            <SelectTrigger className="h-12 text-base bg-white border-gray-300 focus:ring-2 focus:ring-primary/20">
+                            <SelectTrigger>
                               <SelectValue placeholder="締め日を選択" />
                             </SelectTrigger>
                           </FormControl>
-                          <SelectContent className="max-h-80 bg-white">
+                          <SelectContent>
                             {Array.from({ length: 31 }, (_, i) => i + 1).map(
                               (day) => (
-                                <SelectItem
-                                  key={day}
-                                  value={day.toString()}
-                                  className="text-base"
-                                >
+                                <SelectItem key={day} value={day.toString()}>
                                   {day}日
                                 </SelectItem>
                               ),
                             )}
                           </SelectContent>
                         </Select>
-                        <FormMessage className="text-sm text-red-500" />
+                        <FormMessage />
                       </FormItem>
                     )}
                   />
@@ -378,12 +344,10 @@ export function ExpenseList({
                     control={form.control}
                     name="isRecurring"
                     render={({ field }) => (
-                      <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4 space-y-0 border-gray-300 bg-white">
+                      <FormItem className="flex flex-row items-center justify-between space-y-0 rounded-md border p-4">
                         <div className="space-y-0.5">
-                          <FormLabel className="text-base font-medium text-gray-800">
-                            毎月の定期支払い
-                          </FormLabel>
-                          <FormDescription className="text-sm text-gray-600">
+                          <FormLabel>毎月の定期支払い</FormLabel>
+                          <FormDescription>
                             毎月自動的に発生する支出として計算します
                           </FormDescription>
                         </div>
@@ -391,7 +355,6 @@ export function ExpenseList({
                           <Switch
                             checked={field.value}
                             onCheckedChange={field.onChange}
-                            className="scale-125 data-[state=checked]:bg-primary"
                           />
                         </FormControl>
                       </FormItem>
@@ -400,10 +363,14 @@ export function ExpenseList({
                 </div>
                 <DialogFooter>
                   <Button
-                    type="submit"
+                    type="button"
+                    variant="outline"
+                    onClick={() => setOpen(false)}
                     disabled={isLoading}
-                    className="bg-primary text-white hover:bg-primary/90 min-w-[120px] h-12 text-base px-6 shadow-md"
                   >
+                    キャンセル
+                  </Button>
+                  <Button type="submit" disabled={isLoading}>
                     {isLoading
                       ? "処理中..."
                       : editIndex !== null
